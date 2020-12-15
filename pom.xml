@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--groupId、version可被继承，子模块无需声明-->
+    <groupId>cn.mb</groupId>
+    <version>0.0.6-SNAPSHOT</version>
+
+    <artifactId>bb-demo</artifactId>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.1</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!--声明子模块，便于执行修改父pom版本时也修改子模块的<parent>版本-->
+    <modules>
+        <module>common</module>
+        <module>rocketmq</module>
+        <module>spring</module>
+        <module>spite-req</module>
+        <module>wx-pay</module>
+        <module>excel-export</module>
+        <module>custom-annotation</module>
+        <module>async-task</module>
+        <module>mybatis-plus-optimistic-lock</module>
+        <module>repeat-request-solution</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <skipTests>true</skipTests>
+        <java.version>1.8</java.version>
+        <hutool.version>5.4.0</hutool.version>
+        <rocketmq.version>2.1.1</rocketmq.version>
+        <weixin-java-pay.version>4.0.0</weixin-java-pay.version>
+        <poi.version>4.1.2</poi.version>
+        <mybatis-plus-boot-starter.version>3.0.3</mybatis-plus-boot-starter.version>
+        <freemarker.version>2.3.30</freemarker.version>
+        <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!--jar包管理，将所有子模块写在此，这样在其互相引用时，无需声明版本-->
+    <dependencyManagement>
+        <dependencies>
+            <!--Hutool Java工具包-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
+            <!--common模块-->
+            <dependency>
+                <groupId>cn.mb</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!--rocketmq模块-->
+            <dependency>
+                <groupId>cn.mb</groupId>
+                <artifactId>rocketmq</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!--spring模块-->
+            <dependency>
+                <groupId>cn.mb</groupId>
+                <artifactId>spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!--wx支付库-->
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>${weixin-java-pay.version}</version>
+            </dependency>
+            <!--poi-->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <!--mybatis plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+            <!--代码生成器模板-->
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+            <!--mysql-->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

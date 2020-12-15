@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+wx:
+  appId: wx17df887658185a51             # appId
+  mchId: 1603847436            # 商户号
+  mchKey: 2613fa5946944d4281855b5e63c8656d            # 商户密钥
+  certPath: E:\cheG\data\mch-cert\1603847436\apiclient_cert.p12         # 商户证书(.p12)
+  v2PayNotifyUrl: http://bbwangbb.ngrok.wendal.cn/v2/payNotify   # 支付回调
+  v2RefundNotifyUrl: # 退款回调
+
+  # v3
+  apiV3Key: 29945d99d12e4a53a3dd32ccb1cb6f5c  # api v3 密钥
+  privateKeyPath: E:\cheG\data\mch-cert\1603847436\apiclient_key.pem  # 私钥文件
+  privateCertPath: E:\\cheG\\data\\mch-cert\\1603847436\\apiclient_cert.pem  # 证书文件
+  v3PayNotifyUrl: http://bbwangbb.ngrok.wendal.cn/v3/payNotify   # 支付回调
+  # v3暂未提供退款接口

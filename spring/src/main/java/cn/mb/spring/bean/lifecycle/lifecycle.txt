@@ -1,0 +1,19 @@
+spring bean lifecycle
+    ① create object( reflect )
+    ② set attributes(setting value)
+    ③ verify Aware Interface(BeanNameAware/BeanFactoryAware and so on)
+    ④ run BeanPostProcessor's before method(postProcessBeforeInitialization)
+    ⑥ if bean implement InitializingBean, run it's afterPropertiesSet method
+    ⑦ if bean has custom init-method, run it
+    ⑧ rn BeanPostProcessor's after method(postProcessAfterInitialization)
+    ⑨ if bean implement DisposableBean, run it's destroy method
+    ⑩ if bean has custom destroy-method(xml), run it
+
+① create object( reflect )
+Ⅰ if bean has one constructor
+    if it has not params, this bean can been create
+    if it has params, Spring Container will try inject these params, but an exception occurs if params don't exist
+
+Ⅱ if bean has more than on constructors
+    if it has constructor without params, this bean can been create
+    if it has not constructor without params, but has many constructor with params, an no-default-constructor exception occurs when injecting
