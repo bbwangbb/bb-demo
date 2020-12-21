@@ -1,5 +1,6 @@
 spring:
   datasource:
+    # TODO 注意修改为自己的DB
     username: root
     password: root
     url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false
