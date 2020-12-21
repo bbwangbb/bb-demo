@@ -1,4 +1,4 @@
-package cn.mb.excelexport.entity;
+package cn.mb.excelexport.dao.entity;
 
 import cn.mb.excelexport.annotation.ExportField;
 
