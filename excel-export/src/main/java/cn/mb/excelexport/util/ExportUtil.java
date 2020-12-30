@@ -7,12 +7,16 @@ import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import cn.mb.excelexport.annotation.ExportField;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -63,7 +67,7 @@ public class ExportUtil {
      */
     public <T> void export(Class<T> cls, List<T> rows, String fileName, String title, ExcelWriter writer) throws Exception {
         dealTitle(cls, title, writer);
-        int maxRows = writer.isXlsx() ? XLS_PER_SHEET_ROWS : XLSX_PER_SHEET_ROWS;
+        int maxRows = writer.isXlsx() ? XLSX_PER_SHEET_ROWS : XLS_PER_SHEET_ROWS;
         if (rows.size() + 2 > maxRows) {//  大数据量导出采用压缩导出
             exportZip(rows, fileName, maxRows, writer);
         } else {
@@ -99,6 +103,11 @@ public class ExportUtil {
         for (int i = 0; i < page; i++) {
             outputStream = new FileOutputStream(tempDir + "/" + fileName + i + ((writer.isXlsx() ? ".xlsx" : ".xls")));
             currentRows = rows.subList(i * maxRows, i == page - 1 ? rows.size() : (i + 1) * maxRows);
+            //  这种方式会让前面的数据也存在，所以如果最后一页不到上限条数，是无法覆盖前面的数据，所以需要主动移动数据来覆盖
+            if (i == page - 1) {
+                Sheet sheet = writer.getSheet();
+                sheet.shiftRows(currentRows.size() + 1, sheet.getLastRowNum(), -currentRows.size());
+            }
             writer.write(currentRows, true);
             writer.flush(outputStream);
             //  重新从第二行开始设值(此时头行是合并单元格，不管)
