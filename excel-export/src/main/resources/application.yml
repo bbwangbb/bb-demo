@@ -5,9 +5,14 @@ spring:
     password: root
     url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false
     driver-class-name: com.mysql.jdbc.Driver
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0
+      max-file-size: 1024MB
+      max-request-size: 1024MB
 mybatis-plus:
   mapper-locations: classpath:/cn/mb/excelexport/dao/mapper/*.xml
-
 # 导出目录
 export:
   dir: "D:/test/"

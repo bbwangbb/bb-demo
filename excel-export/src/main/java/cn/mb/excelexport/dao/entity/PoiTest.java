@@ -20,9 +20,9 @@ import lombok.Data;
 @TableName("poi_test")
 public class PoiTest {
     @TableId(type = IdType.AUTO)
-    @ExportField(desc = "id")
+    @ExportField(desc = "编号")
     private Long id;
-    @ExportField(desc = "description")
+    @ExportField(desc = "描述")
     private String description;
 
     public PoiTest(String description) {
