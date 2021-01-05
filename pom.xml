@@ -6,7 +6,7 @@
 
     <!--groupId、version可被继承，子模块无需声明-->
     <groupId>cn.mb</groupId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>${revision}</version>
 
     <artifactId>bb-demo</artifactId>
     <packaging>pom</packaging>
@@ -30,9 +30,11 @@
         <module>async-task</module>
         <module>mybatis-plus-optimistic-lock</module>
         <module>repeat-request-solution</module>
+        <module>mapstruct-demo</module>
     </modules>
 
     <properties>
+        <revision>0.0.6-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <skipTests>true</skipTests>
