@@ -25,10 +25,10 @@
         <module>spring</module>
         <module>spite-req</module>
         <module>wx-pay</module>
-        <module>excel-export</module>
         <module>custom-annotation</module>
         <module>async-task</module>
         <module>mybatis-plus-optimistic-lock</module>
+        <module>poi-demo</module>
         <module>repeat-request-solution</module>
         <module>mapstruct-demo</module>
     </modules>

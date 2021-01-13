@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @Component
-@RocketMQMessageListener(consumerGroup = "${rocketmq.msg-type.cancel-order.consumer-group}", topic = "${rocketmq.topic}", selectorExpression = "${rocketmq.msg-type.cancel-order.tag}")
+@RocketMQMessageListener(consumerGroup = "${rocketmq.msg-type.cancel-order.consumer-group}",
+        topic = "${rocketmq.topic}", selectorExpression = "${rocketmq.msg-type.cancel-order.tag}")
 public class CancelOrderConsumer implements RocketMQListener<String> {
     @Override
     public void onMessage(String orderSn) {
