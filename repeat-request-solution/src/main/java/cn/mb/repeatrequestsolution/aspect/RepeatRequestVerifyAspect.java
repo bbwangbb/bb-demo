@@ -7,11 +7,10 @@ import cn.mb.repeatrequestsolution.enums.RedisKeyEnum;
 import cn.mb.repeatrequestsolution.enums.RepeatRequestVerifyMethod;
 import cn.mb.repeatrequestsolution.util.RedisUtil;
 import cn.mb.repeatrequestsolution.util.ReqReqHelper;
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -40,12 +39,9 @@ public class RepeatRequestVerifyAspect {
         this.request = request;
     }
 
-    @Pointcut("execution(public * cn.mb.repeatrequestsolution.controller.*Controller.*(..)) ")
-    public void aspect() {
-    }
-
-    @Around("aspect()")
-    public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Before("execution(public * cn.mb.repeatrequestsolution.controller.*Controller.*(..)) ")
+    public void repeatRequestVerify(JoinPoint joinPoint) {
+        System.out.println("RepeatRequestVerifyAspect");
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
@@ -68,7 +64,6 @@ public class RepeatRequestVerifyAspect {
                     break;
             }
         }
-        return joinPoint.proceed();
     }
 
 }

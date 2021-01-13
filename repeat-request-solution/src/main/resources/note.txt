@@ -1,0 +1,14 @@
+RepeatRequestVerifyController
+    一个注解(RepeatRequestVerify)表明是请求编号 | 请求参数 校验重复请求
+
+RepReqController
+    重复请求校验(不同注解，请求参数[ReqParamVerify]，请求编号[ReqSnVerify])
+
+ReqSnController
+    获取请求编号
+
+以上都是通过切面方式实现，不使用拦截器是因为不好获取参数，不便做参数的重复判断，且拦截器是对大部分接口做拦截
+而对于少量方法做校验，用切面增强会好些
+
+RepeatRequestVerifyInterceptor
+    切面校验重复请求

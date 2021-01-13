@@ -14,7 +14,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -31,7 +30,7 @@ import java.lang.reflect.Method;
  */
 @Aspect
 @Order(3)
-@Component
+//@Component
 public class RepReqVerifyAspect {
 
     private final HttpServletRequest request;
@@ -48,6 +47,7 @@ public class RepReqVerifyAspect {
 
     @Around("aspect()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        System.out.println("RepReqVerifyAspect");
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
