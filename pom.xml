@@ -31,6 +31,7 @@
         <module>poi-demo</module>
         <module>repeat-request-solution</module>
         <module>mapstruct-demo</module>
+        <module>hutool-demo</module>
     </modules>
 
     <properties>
