@@ -1,0 +1,24 @@
+1、引入jar
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+3、基本原理：一条过滤器链
+    其中几个
+        FilterSecurityInterceptor：方法级的过滤器，过滤链的最底层(即检测前面过滤器是否全部放行，放行其再放行)
+            其中的beforeInvocation方法(在其父类中)即用来做权限校验
+        ExceptionTranslationFilter：处理认证授权异常
+        UsernamePasswordAuthenticationFilter：认证过滤器(包含认证、认证成功、认证失败方法，可重写)
+        BasicAuthenticationFilter：授权过滤器(判断有无权限)
+
+4、几个接口
+    UserDetailsService：查询账号(返回用户信息)
+    PasswordEncoder：密码解析(返回加密后的密码)
+    LogoutHandler：退出处理器
+    AccessDeniedHandler：无权限访问处理器
+    AuthenticationEntryPoint：未认证处理

@@ -1,0 +1,251 @@
+2、随意写个接口访问，此时默认所有接口都需要登录后访问
+账号：user
+密码：控制台会输出
+
+5、设置登录的用户名和密码
+    ① 配置文件
+    spring:
+      security:
+        user:
+          name: root
+          password: root
+
+    ② 配置类(自带的UserDetailService)
+    @Configuration
+    public class MemorySecurityConfig extends WebSecurityConfigurerAdapter {
+        //  配置密码加密器
+        @Bean
+        public PasswordEncoder getPasswordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            String psd = bCryptPasswordEncoder.encode("root");
+            //  内存中配置用户
+            auth.inMemoryAuthentication().withUser("root").password(psd).roles("admin");
+        }
+    }
+
+    ③ 配置类(自定义UserDetailService)
+    //  配置类
+    @Configuration
+    public class CustomSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        private UserDetailsService userDetailsService;
+
+        //  配置密码加密器
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        }
+
+    }
+
+    //  UserDetailService
+    @Service("userDetailsService")
+    public class CustomUserDetailService implements UserDetailsService {
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+            List<GrantedAuthority> authorityList = AuthorityUtils.commaSeparatedStringToAuthorityList("role");
+            return new User("root", new BCryptPasswordEncoder().encode("root"), authorityList);
+        }
+    }
+
+    //  结合数据库：整合mybatis-plus后在自定义的UserDetailsService添加对应逻辑即可
+    @Service("userDetailsService")
+    public class CustomUserDetailService implements UserDetailsService {
+
+        @Autowired
+        private SecurityUserDao securityUserDao;
+
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+            SecurityUser securityUser = securityUserDao.selectOne(Wrappers.lambdaQuery(SecurityUser.class)
+                    .eq(SecurityUser::getUsername, username)
+            );
+            if (securityUser != null) {
+                List<GrantedAuthority> authorityList = AuthorityUtils.commaSeparatedStringToAuthorityList("role");
+                return new User(securityUser.getUsername(), new BCryptPasswordEncoder().encode(securityUser.getPassword()), authorityList);
+            }
+            //  不存在抛自带异常
+            throw new UsernameNotFoundException("用户名不存在");
+        }
+    }
+
+6、自定义登录页面及拦截和放行url
+    配置类重写方法
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.formLogin()//  自定义登录页面
+                .loginPage("/login.html")// 登录页面设置
+                .loginProcessingUrl("/user/login")//    登录访问路径(即登录接口的url)
+                .defaultSuccessUrl("/index").permitAll()// 登录成功后跳转路径
+                .and().authorizeRequests()
+                .antMatchers("/", "/hello", "/user/login").permitAll()//    放行路径
+                .anyRequest().authenticated()// 其他需要认证
+                .and().csrf().disable();//  禁用csrf
+    }
+
+7、基于角色或权限的访问控制
+    基于权限的访问控制
+        配置类的http配置中.antMatchers("url1", "url2").hasAuthority|hasAnyAuthority
+        UserDetailsService中，权限配置不以ROLE_开头就是权限
+
+    基于角色的访问控制
+        配置类的http配置中.antMatchers("url1", "url2").hasRole|hasAnyRole
+        UserDetailsService中，权限配置以ROLE_开头的就是角色
+
+8、自定义403页面
+    http.exceptionHandling().accessDeniedPage("/unauth.html");//    页面路径
+
+9、注解
+    @EnableGlobalMethodSecurity：启用各种注解
+        securedEnabled = true：启用@Secure注解
+        prePostEnabled = true：启用@PreAuthorize和@PostAuthorize注解
+    @Secured({"ROLE_role1", "ROLE_role2"})：贴在controller上，表示有角色可访问
+    @PreAuthorize("hasAnyAuthority('index12')")：hasRole|hasAnyAuthority等几个方法，类似于配置类中设置
+    @PostAuthorize：方法执行之后校验，用法同@PreAuthorize
+    @PostFilter：对返回值做过滤
+    @PreFilter：对参数做过滤(用法同@PostFilter)
+
+10、登出
+    配置类http配置：http.logout().logoutUrl("/logout").logoutSuccessUrl("登出成功访问");
+
+11、N天内自动登录
+    原理：
+        通过cookie实现，其携带的是一个加密token，并将其存储在DB中记录对应账号，
+        若通过该cookie查找到对应信息，则自动进行登录操作
+        RememberMeAuthenticationFilter
+
+    实现：
+        建表：JdbcTokenRepositoryImpl.CREATE_TABLE_SQL
+
+        注入数据源
+            //  注入数据源
+            @Autowired
+            private DataSource dataSource;
+
+            @Bean
+            public PersistentTokenRepository persistentTokenRepository() {
+                JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+                jdbcTokenRepository.setDataSource(dataSource);
+                //  自动创建表
+        //        jdbcTokenRepository.setCreateTableOnStartup(true);
+                return jdbcTokenRepository;
+            }
+
+        配置http
+           .and().rememberMe().tokenRepository(persistentTokenRepository())//  注入persistentTokenRepository
+           .tokenValiditySeconds(60)// 有效时间(单位:s)
+           .userDetailsService(userDetailsService)//   指定UserDetailsService
+
+        登录页添加复选框，name必须为remember-me
+            <input type="checkbox" name="remember-me">
+
+12、CSRF：跨站请求伪装
+    一个浏览器多个网页，B网页伪装成A网页进行请求
+
+    解决：
+        Spring Security会对PATCH/POST/PUT/DELETE请求做保护
+        http配置不禁用csrf
+        登录页添加标签
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+    原理：
+        生成一个token，每次访问携带token找到对应session进行访问(但感觉是jsp的请求方式)
+
+原理
+    原生的Security还是根据Session来判断，判断session中是否有SecurityContext对象(认证信息)，有则拿出来放到线程中
+
+13、结合JWT使用
+    自定义login接口，登录后，将用户数据(角色/权限)搞成UserDetails
+    加密后返回token，有必要时返回请求头名
+    而后用户请求携带该token
+    由于Security是一条过滤链，则我们自己实现一个解析token的过滤器，并将token解析后的UserDetails放入线程中
+    则可请求需认证请求
+    public class MyTokenFilter extends OncePerRequestFilter {
+
+        @Autowired
+        private UserDetailsService userDetailsService;
+        @Autowired
+        private JwtTokenUtil jwtTokenUtil;
+        @Value("${jwt.tokenHeader}")
+        private String tokenHeader;
+        @Value("${jwt.tokenHead}")
+        private String tokenHead;
+
+        @Override
+        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+            //  获取请求头
+            String authHeader = request.getHeader(this.tokenHeader);
+            //  校验格式[格式为：Bearer Token]
+            if (authHeader != null && authHeader.startsWith(this.tokenHead)) {
+                //  获取token
+                String authToken = authHeader.substring(this.tokenHead.length());// The part after "Bearer "
+                //  解析出用户名(这里可以修改工具类，加密解密直接获取UserDetails)
+                String username = jwtTokenUtil.getUserNameFromToken(authToken);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    //  获取UserDetails
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                    if (jwtTokenUtil.validateToken(authToken, userDetails)) {
+                        //  将用户信息放入SecurityContextHolder中
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+            }
+            chain.doFilter(request, response);
+        }
+    }
+    经过以上处理，只要后续携带了token且解析成功，那么需认证请求都可访问
+    不用关注自带的login请求，我们自己写即可
+
+14、未认证、无权限处理器
+    /**
+     * <p>
+     *  无权限处理器
+     * </p>
+     *
+     * @author: guohaibin
+     * @createDate: 2021/2/23
+     */
+    public class MyAccessDeniedHandler implements AccessDeniedHandler {
+        @Override
+        public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Cache-Control","no-cache");
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.getWriter().println("无权限访问，滚");
+            response.getWriter().flush();
+        }
+    }
+
+    /**
+     * <p>
+     *  未认证处理器
+     * </p>
+     *
+     * @author: guohaibin
+     * @createDate: 2021/2/23
+     */
+    public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
+        @Override
+        public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Cache-Control","no-cache");
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.getWriter().println("未认证，滚");
+            response.getWriter().flush();
+        }
+    }

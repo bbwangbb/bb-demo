@@ -1,0 +1,126 @@
+原理
+    FilterSecurityInterceptor为最后一个过滤链
+    FilterSecurityInterceptor.doFilter 调用 FilterSecurityInterceptor.invoke
+    在invoke中有 InterceptorStatusToken token = super.beforeInvocation(filterInvocation);
+    beforeInvocation即包含鉴权操作，其要点如下
+        ① 获取当前资源所需权限
+            Collection<ConfigAttribute> attributes = this.obtainSecurityMetadataSource().getAttributes(object);
+
+        ② 获取认证信息
+            Authentication authenticated = authenticateIfRequired();
+
+        ③ 判断是否有权限执行
+            attemptAuthorization(object, attributes, authenticated);
+            跟进
+            try {
+                this.accessDecisionManager.decide(authenticated, object, attributes);
+            }
+            catch (AccessDeniedException accessDeniedException) {
+                publishEvent(new AuthorizationFailureEvent(object, attributes, authenticated,
+                        accessDeniedException));
+
+                throw accessDeniedException;
+            }
+
+    第②步由jwt过滤器将认证信息解析并放入SecurityContext中，这一步不管
+    因此只需管①、③
+    ① 获取该url所需权限
+        其中调用的是this.obtainSecurityMetadataSource()
+        获取到一个SecurityMetadataSource对象，该类为接口，此处选择实现其子接口FilterInvocationSecurityMetadataSource[CustomMetadataSource]
+        实现后在其getAttributes方法中返回当前资源对应的Collection<ConfigAttribute>
+        可选：
+            如果角色权限不是直接用/a/b来代表权限，可以在该类构造时初始化所有的权限映射(比如：/a/b对应的权限是ab)
+            简单做法就是权限用url即可，这样无需变化
+        核心代码如下
+            public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
+                List<ConfigAttribute>  configAttributes = new ArrayList<>();
+                //  获取当前访问的路径
+                String url = ((FilterInvocation) o).getRequestUrl();
+                if (allResource.contains(url)) {
+                    configAttributes.add(new org.springframework.security.access.SecurityConfig(url));
+                }
+                //  如果没映射
+        //        configAttributes.add(new org.springframework.security.access.SecurityConfig(url));
+                return configAttributes;
+            }
+
+    ③ 判断是否有权限执行
+        其中调用的是this.accessDecisionManager
+        其是一个AccessDecisionManager对象，也为接口，我们也实现他[CustomAccessDecisionManager]
+        实现后在其decide方法中判断当前用户是否有权限访问该资源
+        核心代码如下
+            public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
+                // 当接口未被配置资源时直接放行
+                if (CollUtil.isEmpty(configAttributes)) {
+                    return;
+                }
+                Iterator<ConfigAttribute> iterator = configAttributes.iterator();
+                while (iterator.hasNext()) {
+                    ConfigAttribute configAttribute = iterator.next();
+                    //  将当前访问所需资源或用户拥有资源进行比对
+                    String needAuthority = configAttribute.getAttribute();
+                    for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
+                        //  如果有该权限直接放行
+                        if (needAuthority.trim().equals(grantedAuthority.getAuthority())) {
+                            return;
+                        }
+                    }
+                }
+                throw new AccessDeniedException("抱歉，您没有访问权限");
+            }
+
+    由上可知，FilterSecurityInterceptor中通过beforeInvocation可实现鉴权，因此我们主动实现一个鉴权过滤器[CustomAuthFilter]
+    在其doFilter方法中，先放行我们不需要管的请求
+    处理后则调用父类的beforeInvocation方法开始鉴权
+    但首先需要注入前面①、③步骤重写的组件CustomMetadataSource、CustomAccessDecisionManager
+    代码如下
+        public class CustomAuthFilter extends AbstractSecurityInterceptor implements Filter {
+
+            private final IgnoreUrlsConfig ignoreUrlsConfig;
+            private final CustomMetadataSource customMetadataSource;
+
+            public CustomAuthFilter(IgnoreUrlsConfig ignoreUrlsConfig, CustomMetadataSource customMetadataSource, CustomAccessDecisionManager customAccessDecisionManager) {
+                this.ignoreUrlsConfig = ignoreUrlsConfig;
+                this.customMetadataSource = customMetadataSource;
+                super.setAccessDecisionManager(customAccessDecisionManager);
+            }
+
+            @Override
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+                HttpServletRequest request = (HttpServletRequest) servletRequest;
+                FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, filterChain);
+                //  OPTIONS请求直接放行
+                if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
+                    fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
+                    return;
+                }
+                //  白名单请求直接放行
+                PathMatcher pathMatcher = new AntPathMatcher();
+                for (String path : ignoreUrlsConfig.getUrls()) {
+                    if (pathMatcher.match(path, request.getRequestURI())) {
+                        fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
+                        return;
+                    }
+                }
+                //  此处会调用AccessDecisionManager中的decide方法进行鉴权操作
+                InterceptorStatusToken token = super.beforeInvocation(fi);
+                try {
+                    fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
+                } finally {
+                    super.afterInvocation(token, null);
+                }
+            }
+
+            @Override
+            public Class<?> getSecureObjectClass() {
+                return FilterInvocation.class;
+            }
+
+            @Override
+            public SecurityMetadataSource obtainSecurityMetadataSource() {
+                return customMetadataSource;
+            }
+        }
+
+    最后一步，在Security的配置类中添加过滤器[在FilterSecurityInterceptor前添加即可]
+        http.addFilterBefore(customAuthFilter, FilterSecurityInterceptor.class);

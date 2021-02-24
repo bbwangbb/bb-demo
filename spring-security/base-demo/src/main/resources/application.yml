@@ -1,0 +1,21 @@
+#spring:
+#  security:
+    # 若需自定义账号密码，在此配置
+#    user:
+#      name: root
+#      password: root
+#      roles: admin
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+mybatis-plus:
+  mapper-locations: classpath:/cn/mb/cn.mb.basedemo/mapper/*.xml
+
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: security #JWT加解密使用的密钥
+  expiration: 604800 #JWT的超期限时间(60*60*24*7)
+  tokenHead: 'Bearer '  #JWT负载中拿到开头
