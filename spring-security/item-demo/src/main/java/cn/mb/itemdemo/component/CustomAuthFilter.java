@@ -16,7 +16,7 @@ import java.io.IOException;
 
 /**
  * <p>
- *  自定义鉴权过滤器
+ *  自定义鉴权过滤器(依赖CustomMetadataSource和CustomAccessDecisionManager)
  * </p>
  *
  * @author: guohaibin

@@ -54,5 +54,4 @@ public class CustomTokenFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-
 }

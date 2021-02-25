@@ -1,10 +1,7 @@
 package cn.mb.itemdemo.config;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.mb.itemdemo.component.CustomAccessDeniedHandler;
-import cn.mb.itemdemo.component.CustomAuthFilter;
-import cn.mb.itemdemo.component.CustomAuthenticationEntryPoint;
-import cn.mb.itemdemo.component.CustomTokenFilter;
+import cn.mb.itemdemo.component.*;
 import cn.mb.itemdemo.service.UserService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,8 +9,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -32,20 +27,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthFilter customAuthFilter;
     private final CustomTokenFilter customTokenFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final MyAccessDecisionManager myAccessDecisionManager;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public WebSecurityConfig(UserService userService, IgnoreUrlsConfig ignoreUrlsConfig, CustomAuthFilter customAuthFilter, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomTokenFilter customTokenFilter) {
+    public WebSecurityConfig(UserService userService, IgnoreUrlsConfig ignoreUrlsConfig, CustomAuthFilter customAuthFilter, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomTokenFilter customTokenFilter, MyAccessDecisionManager myAccessDecisionManager) {
         this.userService = userService;
         this.ignoreUrlsConfig = ignoreUrlsConfig;
         this.customAuthFilter = customAuthFilter;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customTokenFilter = customTokenFilter;
+        this.myAccessDecisionManager = myAccessDecisionManager;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
+//        auth.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
     }
 
     @Override
@@ -54,8 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll();
         //  安全路径白名单
         http.authorizeRequests().antMatchers(ArrayUtil.toArray(ignoreUrlsConfig.getUrls(), String.class)).permitAll();
-        //  其他请求需认证
-        http.authorizeRequests().anyRequest().authenticated();
+        //  其他请求需认证，并指定鉴权处理器
+        http.authorizeRequests().anyRequest().authenticated().accessDecisionManager(myAccessDecisionManager);
         //  关闭跨站请求防护及不使用session
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         //  配置自定义处理器
@@ -63,6 +60,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //  自定义token解析器
         http.addFilterBefore(customTokenFilter, UsernamePasswordAuthenticationFilter.class);
         //  自定义权限过滤器
-        http.addFilterBefore(customAuthFilter, FilterSecurityInterceptor.class);
+//        http.addFilterBefore(customAuthFilter, FilterSecurityInterceptor.class);
     }
 }

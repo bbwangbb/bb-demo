@@ -124,3 +124,6 @@
 
     最后一步，在Security的配置类中添加过滤器[在FilterSecurityInterceptor前添加即可]
         http.addFilterBefore(customAuthFilter, FilterSecurityInterceptor.class);
+
+    简便方式：实现AccessDecisionManager(MyAccessDecisionManager)对象并注入即可
+        http.authorizeRequests().anyRequest().authenticated().accessDecisionManager(myAccessDecisionManager);

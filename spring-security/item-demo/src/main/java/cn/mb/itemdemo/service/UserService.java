@@ -27,6 +27,7 @@ public class UserService implements UserDetailsService {
                 .eq(SecurityUser::getUsername, username)
         );
         if (securityUser != null) {
+            //  用户权限
             List<GrantedAuthority> authorityList = AuthorityUtils.commaSeparatedStringToAuthorityList("/update");
             return new User(securityUser.getUsername(), new BCryptPasswordEncoder().encode(securityUser.getPassword()), authorityList);
         }
