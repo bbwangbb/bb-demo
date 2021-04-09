@@ -1,13 +1,15 @@
 package cn.mb.wxpay.test;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONObject;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.io.FileUtil;
+import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
+import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.config.WxPayConfig;
+import com.github.binarywang.wxpay.constant.WxPayConstants;
+import com.github.binarywang.wxpay.service.WxPayService;
+import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
 /**
  * <p>
@@ -19,38 +21,29 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) throws Exception {
+        //  native支付
+        WxPayConfig wxPayConfig = new WxPayConfig();
+        wxPayConfig.setAppId("wx17df887658185a51");
+        wxPayConfig.setMchId("1603847436");
+        wxPayConfig.setMchKey("2613fa5946944d4281855b5e63c8656d");
+        WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
+        wxPayUnifiedOrderRequest.setOutTradeNo("DD20210409000007");
+        wxPayUnifiedOrderRequest.setBody("测试支付");
+        wxPayUnifiedOrderRequest.setTotalFee(1);
+        wxPayUnifiedOrderRequest.setSpbillCreateIp("127.0.0.1");
+        wxPayUnifiedOrderRequest.setNotifyUrl("http://bbwangbb.ngrok.wendal.cn/v2/payNotify");
+        wxPayUnifiedOrderRequest.setTradeType(WxPayConstants.TradeType.NATIVE);
+        wxPayUnifiedOrderRequest.setProductId("1");
+        WxPayService wxPayService = new WxPayServiceImpl();
+        wxPayService.setConfig(wxPayConfig);
+        WxPayNativeOrderResult wxPayNativeOrderResult = wxPayService.createOrder(wxPayUnifiedOrderRequest);
+        System.out.println(wxPayNativeOrderResult);
+        byte[] scanPayQrcodeMode2 = wxPayService.createScanPayQrcodeMode2(wxPayNativeOrderResult.getCodeUrl(), new File("C:\\Users\\HUAWEI\\Desktop\\test2.png"), 500);
+        String encode = Base64.encode(scanPayQrcodeMode2).replaceAll("\r\n", "");;
+        System.out.println(encode.length());
+        FileUtil.writeBytes(scanPayQrcodeMode2, "C:\\Users\\HUAWEI\\Desktop\\test1.png");
 
-//        WxPayConfig wxPayConfig = new WxPayConfig();
-//        wxPayConfig.setAppId("wx17df887658185a51");
-//        wxPayConfig.setMchId("1603847436");
-//        wxPayConfig.setMchKey("2613fa5946944d4281855b5e63c8656d");
-//        WxPayOrderQueryRequest wxPayOrderQueryRequest = new WxPayOrderQueryRequest();
-//        wxPayOrderQueryRequest.setOutTradeNo("DD20210115000002");
-//        WxPayService wxPayService = new WxPayServiceImpl();
-//        wxPayService.setConfig(wxPayConfig);
-//        WxPayOrderQueryResult wxPayOrderQueryResult = wxPayService.queryOrder(wxPayOrderQueryRequest);
-//        System.out.println(wxPayOrderQueryResult);
-
-        long start = System.currentTimeMillis();
-        LocalDate startDate = LocalDate.parse("2020-11-01");
-        LocalDate endDate = LocalDate.parse("2021-01-23");
-        String url = "https://api.weixin.qq.com/datacube/getweanalysisappiddailyvisittrend?access_token=41_onoMyQsVTPR5auU3gglIj8xfAEhGXmbKH84-WpMHfJXNZyqhNf1_zEEV_EmbhFy7S_99uQinV9YPTSb0VbySkwOgnBgEoayi88yIZb4g-pFCDM-0JF8bpc7YypSk5iKQzn7Qdg9JQRv3bMXjUPWeAHDHCJ";
-        long days = startDate.until(endDate, ChronoUnit.DAYS);
-        JSONObject params = new JSONObject();
-        List<String> results = new ArrayList<>();
-        String date;
-        for (int i = 0; i <= days; i++) {
-            date = startDate.plusDays(i + 1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            System.out.println("current date " + date);
-            params.set("begin_date", date);
-            params.set("end_date", date);
-            results.add(HttpRequest.post(url).body(params.toString()).execute().body());
-        }
-        System.out.println(results);
-        long end = System.currentTimeMillis();
-        System.out.println("spend " + (end - start));
     }
-
 
     public void 测试() {
     }

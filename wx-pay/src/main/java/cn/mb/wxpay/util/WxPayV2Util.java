@@ -39,7 +39,7 @@ public class WxPayV2Util {
 
     /**
      * <p>
-     *  JSAPI支付
+     *  统一下单(各种下单都可调用)
      * </p>
      * @param appId             小程序appId
      * @param mchId             小程序绑定商户号
@@ -64,8 +64,8 @@ public class WxPayV2Util {
         if (StrUtil.isNotEmpty(mchKey)) wxPayConfig.setMchKey(mchKey);
         wxPayConfig.setSignType(WxPayConstants.SignType.MD5);
         if (StrUtil.isNotEmpty(mchKey)) wxPayConfig.setTradeType(tradeType);
-        wxPayService.setConfig(wxPayConfig);
         if (ObjectUtil.notEqual(WxPayConstants.TradeType.NATIVE, tradeType)) wxPayConfig.setNotifyUrl(v2PayNotifyUrl);
+        wxPayService.setConfig(wxPayConfig);
         WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
         wxPayUnifiedOrderRequest.setBody(body);
         wxPayUnifiedOrderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(totalFee.toString()));
