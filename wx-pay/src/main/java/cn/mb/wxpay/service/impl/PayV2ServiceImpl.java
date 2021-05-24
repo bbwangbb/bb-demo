@@ -12,6 +12,10 @@ import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 /**
  * <p>
  *  支付服务
@@ -25,6 +29,14 @@ import org.springframework.stereotype.Service;
 public class PayV2ServiceImpl implements PayV2Service {
 
     private final WxConfig wxConfig;
+
+    /** 支付回调线程池 */
+    private static final ThreadPoolExecutor payNotifyThreadPool = new ThreadPoolExecutor(
+            Runtime.getRuntime().availableProcessors(),
+            Runtime.getRuntime().availableProcessors(),
+            1L,
+            TimeUnit.MINUTES,
+            new LinkedBlockingQueue<>(300));
 
     public PayV2ServiceImpl(WxConfig wxConfig) {
         this.wxConfig = wxConfig;
@@ -54,18 +66,21 @@ public class PayV2ServiceImpl implements PayV2Service {
             wxPayService.setConfig(wxPayConfig);
             //  校验签名，若为恶意请求会报错，除非您签名都能搞定
             result.checkResult(wxPayService, result.getSignType(), false);
-            //  订单号
             String outTradeNo = result.getOutTradeNo();
-            while (true) {
-                //  获取订单
+            //  异步执行逻辑，微信支付回调5S内不响应则算作超时
+            payNotifyThreadPool.submit(() -> {
+                //  订单号
+                while (true) {
+                    //  获取订单
 
-                //  判断订单状态
+                    //  判断订单状态
 
-                //  检验金额是否一致
+                    //  检验金额是否一致
 
-                //  并发修改
-                break;
-            }
+                    //  并发修改
+                    break;
+                }
+            });
             return WxPayNotifyResponse.success("处理成功!");
         } catch (Exception e) {
             log.error("微信支付回调异常,异常原因:{},参数为:{}", e.getMessage(), xmlData);

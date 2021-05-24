@@ -10,6 +10,10 @@ import com.github.binarywang.wxpay.v3.util.AesUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 /**
  * <p>
  *
@@ -23,6 +27,13 @@ import org.springframework.stereotype.Service;
 public class PayV3ServiceImpl implements PayV3Service {
 
     private final WxConfig wxConfig;
+    /** 支付回调线程池 */
+    private static final ThreadPoolExecutor payNotifyThreadPool = new ThreadPoolExecutor(
+            Runtime.getRuntime().availableProcessors(),
+            Runtime.getRuntime().availableProcessors(),
+            1L,
+            TimeUnit.MINUTES,
+            new LinkedBlockingQueue<>(300));
 
     public PayV3ServiceImpl(WxConfig wxConfig) {
         this.wxConfig = wxConfig;
@@ -43,9 +54,20 @@ public class PayV3ServiceImpl implements PayV3Service {
             PayV3NotifyDecrypt payV3NotifyDecrypt = JSONUtil.toBean(decryptToString, PayV3NotifyDecrypt.class);
             //  订单号
             String outTradeNo = payV3NotifyDecrypt.getOut_trade_no();
-            //  判断订单状态
+            //  异步执行逻辑，微信支付回调5S内不响应则算作超时
+            payNotifyThreadPool.submit(() -> {
+                //  订单号
+                while (true) {
+                    //  获取订单
 
-            //  修改订单状态
+                    //  判断订单状态
+
+                    //  检验金额是否一致
+
+                    //  并发修改
+                    break;
+                }
+            });
             return WxPayNotifyResponse.success("处理成功!");
         } catch (Exception e) {
             log.error("微信v3支付回调异常,异常原因:{},参数为:{}", e.getMessage(), payV3Notify);
