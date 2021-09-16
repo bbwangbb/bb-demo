@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * <p>
- *
+ * security配置类
  * </p>
  *
  * @author: guohaibin
@@ -51,8 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll();
         //  安全路径白名单
         http.authorizeRequests().antMatchers(ArrayUtil.toArray(ignoreUrlsConfig.getUrls(), String.class)).permitAll();
-        //  其他请求需认证，并指定鉴权处理器
-        http.authorizeRequests().anyRequest().authenticated().accessDecisionManager(myAccessDecisionManager);
+        //  其他请求需认证
+        http.authorizeRequests().anyRequest().authenticated();
         //  关闭跨站请求防护及不使用session
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         //  配置自定义处理器
@@ -61,5 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(customTokenFilter, UsernamePasswordAuthenticationFilter.class);
         //  自定义权限过滤器
 //        http.addFilterBefore(customAuthFilter, FilterSecurityInterceptor.class);
+        //  直接注入鉴权处理器
+        http.authorizeRequests().accessDecisionManager(myAccessDecisionManager);
     }
 }

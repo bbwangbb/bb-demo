@@ -33,6 +33,12 @@
         <module>mapstruct-demo</module>
         <module>hutool-demo</module>
         <module>spring-security</module>
+        <module>web-demo</module>
+        <module>demo-spring-boot-starter</module>
+        <module>spring-boot-admin</module>
+        <module>spring-boot-admin/admin-server</module>
+        <module>spring-boot-admin/admin-client</module>
+        <module>spring-boot</module>
     </modules>
 
     <properties>

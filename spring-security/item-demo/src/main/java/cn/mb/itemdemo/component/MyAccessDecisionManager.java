@@ -24,7 +24,7 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
         //  url即为资源名
-        String url = ((FilterInvocation) object).getRequestUrl();
+            String url = ((FilterInvocation) object).getRequestUrl();
         for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
             //  如果有该权限直接放行
             if (url.trim().equals(grantedAuthority.getAuthority())) {

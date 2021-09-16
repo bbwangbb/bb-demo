@@ -1,16 +1,10 @@
 package cn.mb.spring.bean.lifecycle;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  * <p>
@@ -22,6 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Component
+@NoArgsConstructor
 public class LifeCycleBean implements InitializingBean, DisposableBean {
 
 //    public LifeCycleBean() {

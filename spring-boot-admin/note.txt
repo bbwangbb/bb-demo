@@ -1,0 +1,69 @@
+1、admin server
+    pom
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-server</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+    启动类贴注解：@EnableAdminServer
+
+2、admin client
+    pom
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+    yml
+        # 注册到admin
+        spring:
+          boot:
+            admin:
+              client:
+                instance:
+                  prefer-ip: true
+                url: http://127.0.0.1:8769
+        # 暴露信息
+        management:
+          endpoints:
+            web:
+              exposure:
+                include: '*'
+          endpoint:
+            health:
+              show-details: ALWAYS
+
+3、邮件通知配置，在admin server上配置yml
+    163邮箱发送：以下为smtp方式
+        spring:
+          # 发件邮箱配置
+          mail:
+            host: smtp.163.com
+            username: 18331181408@163.com
+            # 这个不是邮箱密码，是smtp的密码，具体可以百度获取
+            password: VNHBHQHCINFPZAWF
+            properties:
+              mail:
+                smtp:
+                  auth: true
+                  starttls:
+                    enable: true
+                    required: true
+          boot:
+            admin:
+              notify:
+                mail:
+                  # 收件邮箱
+                  to: guo1051127705@qq.com
+                  # 发件邮箱(即上面配置的那个)
+                  from: 18331181408@163.com
+
+4、日志配置
+    在server中指定client的日志文件，启动后就会读取日志文件，然后显示
+    然而并没有测试成功，我笑了 - -

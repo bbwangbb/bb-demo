@@ -1,0 +1,8 @@
+spring:
+  redis:
+    sentinel:
+      # sentinel监视器名字，即sentinel.conf中monitor名字
+      master: mymaster
+      # sentinel节点
+      nodes: 192.168.3.112:26379,192.168.3.112:26380,192.168.3.112:26381
+      password:

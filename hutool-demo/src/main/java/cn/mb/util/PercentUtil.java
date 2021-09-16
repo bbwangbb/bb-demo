@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 /**
  * <p>
  *  百分比工具类
+ *  [百分比工具demo](https://blog.csdn.net/qq_42274641/article/details/98640070)
+ *  [Non-terminating decimal expansion； no exact representable decimal result.](https://blog.csdn.net/u010511598/article/details/109142928)
  * </p>
  *
  * @author: guohaibin

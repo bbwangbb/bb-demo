@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: admin-server
+  mail:
+    host: smtp.163.com
+    username: 18331181408@163.com
+    password: VNHBHQHCINFPZAWF
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  boot:
+    admin:
+      notify:
+        mail:
+          to: guo1051127705@qq.com
+          from: 18331181408@163.com
+server:
+  port: 8769
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+#    logfile:
+#      external-file: D:/logs/output.log  #指向日志文件地址，需与LogBack配置的日志地址一致
+  # 在访问/actuator/health时显示完整信息
+  endpoint:
+    health:
+      show-details: always
+logging:
+  file:
+    name: D:/logs/sample-boot-application.log
+  pattern:
+    file: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"

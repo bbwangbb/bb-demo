@@ -1,0 +1,2 @@
+# 标注配置类自动装配
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.mb.config.BBConfig

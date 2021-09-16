@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: admin-client
+  boot:
+    admin:
+      client:
+        instance:
+          prefer-ip: true
+        url: http://127.0.0.1:8769
+server:
+  port: 8768
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+## 定义日志文件输出路径  [注释后 不显示 本服务的 logfile 模块]
+#logging:
+#  file: D:/logs/output.log
