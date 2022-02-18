@@ -37,7 +37,7 @@ public class 短信测试 {
 
     private final static String regionId = "cn-hangzhou";
     private final static String accessKeyId = "xxx";
-    private final static String accessSecret = "PGqMnAF65aDTWNLQyRNkl0DXh5ZsmR";
+    private final static String accessSecret = "xxx";
 
     public static void main(String[] args) throws Exception {
 //        年检提醒();
