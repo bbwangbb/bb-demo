@@ -36,7 +36,7 @@ import java.util.Map;
 public class 短信测试 {
 
     private final static String regionId = "cn-hangzhou";
-    private final static String accessKeyId = "LTAI4GD67ma3DKAME8ejEraw";
+    private final static String accessKeyId = "xxx";
     private final static String accessSecret = "PGqMnAF65aDTWNLQyRNkl0DXh5ZsmR";
 
     public static void main(String[] args) throws Exception {
