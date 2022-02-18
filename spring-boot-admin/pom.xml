@@ -5,6 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spring-boot-admin</artifactId>
+    <version>${revision}</version>
 
     <!--父pom-->
     <parent>

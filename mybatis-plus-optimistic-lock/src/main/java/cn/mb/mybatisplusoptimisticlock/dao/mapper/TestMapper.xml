@@ -10,4 +10,12 @@
         <result column="version" property="version" />
     </resultMap>
 
+
+    <insert id="insertBatch">
+        insert into test(num, update_time) values
+        <foreach collection="list" separator="," item="item" close="" open="">
+            (#{item.num}, #{item.updateTime})
+        </foreach>
+    </insert>
+
 </mapper>

@@ -1,0 +1,10 @@
+wx:
+  miniapp:
+    appid: wxed0e4d28d71ae432
+    secret: 911766b3f86b9e62975b45cf136cbaa9
+  pay:
+    enable: true
+    appId: wxed0e4d28d71ae432
+    mchId: 1603847436
+    mchKey: 2613fa5946944d4281855b5e63c8656d
+    keyPath: E:\cheG\data\mch-cert\1603847436\apiclient_cert.p12

@@ -2,13 +2,14 @@ package cn.mb.mybatisplusoptimisticlock.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -19,11 +20,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * @since 2020-11-05
  */
 @Data
+@NoArgsConstructor
 @Accessors(chain = true)
 @TableName(value = "test", resultMap = "BaseResultMap")
 public class Test implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    public Test(Integer num, LocalDateTime updateTime) {
+        this.num = num;
+        this.updateTime = updateTime;
+    }
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;

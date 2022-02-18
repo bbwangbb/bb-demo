@@ -30,10 +30,10 @@ public class TestController {
     @GetMapping("/test")
     public void test() throws Exception {
         List<ExportData> rows = CollUtil.newArrayList();
-        rows.add(new ExportData("bb", 22, "男"));
-        rows.add(new ExportData("cc", 23, "男"));
-        rows.add(new ExportData("dd", 24, "女"));
-        rows.add(new ExportData("ee", 25, "女"));
+        rows.add(new ExportData("bb", 22, "男", CollUtil.toList("bb", "22")));
+        rows.add(new ExportData("cc", 23, "男", CollUtil.toList("cc", "23")));
+        rows.add(new ExportData("dd", 24, "女", CollUtil.toList("dd", "24")));
+        rows.add(new ExportData("ee", 25, "女", CollUtil.toList("ee", "25")));
         //  xlsx
         ExcelWriter writer = ExcelUtil.getWriter(true);
         //  自定义操作

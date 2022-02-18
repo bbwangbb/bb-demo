@@ -1,0 +1,15 @@
+version: ""
+services:
+  nginx:
+    container_name: nginx
+    image:
+    ports:
+    - 80:80
+    - 8080:8080
+    volumes:
+    - /etc/nginx/conf:xxx
+    restart: always
+    # 端口映射、目录映射、
+    networks:
+      nginx-network:
+        - ipv4_address:

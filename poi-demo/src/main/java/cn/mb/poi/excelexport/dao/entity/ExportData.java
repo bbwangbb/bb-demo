@@ -1,6 +1,11 @@
 package cn.mb.poi.excelexport.dao.entity;
 
 import cn.mb.poi.excelexport.annotation.ExportField;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * <p>
@@ -10,6 +15,9 @@ import cn.mb.poi.excelexport.annotation.ExportField;
  * @author: guohaibin
  * @createDate: 2020/11/26
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExportData {
 
     @ExportField(desc = "姓名")
@@ -18,37 +26,7 @@ public class ExportData {
     private Integer age;
     @ExportField(desc = "性别")
     private String  sex;
+    @ExportField(desc = "列表")
+    private List<String> stringList;
 
-    public ExportData() {
-    }
-
-    public ExportData(String name, Integer age, String sex) {
-        this.name = name;
-        this.age = age;
-        this.sex = sex;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
 }

@@ -86,9 +86,9 @@
             }
 
             @Override
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain customFilterChain) throws IOException, ServletException {
                 HttpServletRequest request = (HttpServletRequest) servletRequest;
-                FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, filterChain);
+                FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, customFilterChain);
                 //  OPTIONS请求直接放行
                 if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
                     fi.getChain().doFilter(fi.getRequest(), fi.getResponse());

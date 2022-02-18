@@ -1,9 +1,6 @@
 package cn.mb.springboot.redis.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -18,16 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class TestController {
 
-    private final RedisTemplate<String, String> redisTemplate;
-
-    @GetMapping("/set")
-    public void set(@RequestParam("str") String str) {
-        redisTemplate.opsForValue().set(str, str);
-    }
-
-    @GetMapping("/get")
-    public String get(@RequestParam("str") String str) {
-        return redisTemplate.opsForValue().get(str);
-    }
+//    private final RedisTemplate<String, String> redisTemplate;
+//
+//    @GetMapping("/set")
+//    public void set(@RequestParam("str") String str) {
+//        redisTemplate.opsForValue().set(str, str);
+//    }
+//
+//    @GetMapping("/get")
+//    public String get(@RequestParam("str") String str) {
+//        return redisTemplate.opsForValue().get(str);
+//    }
 
 }
